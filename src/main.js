@@ -29,9 +29,23 @@ ipcMain.handle("ask-image", async (event, data) => {
             throw new Error("Image and question are required.");
         }
 
+        const historyMessages = Array.isArray(data.history)
+            ? data.history
+                .filter(message =>
+                    message &&
+                    ["user", "assistant"].includes(message.role) &&
+                    typeof message.content === "string"
+                )
+                .map(message => ({
+                    role: message.role,
+                    content: message.content
+                }))
+            : [];
+
         const response = await groq.chat.completions.create({
             model: "qwen/qwen3.8-27b",
             messages: [
+                ...historyMessages,
                 {
                     role: "user",
                     content: [
@@ -53,6 +67,7 @@ ipcMain.handle("ask-image", async (event, data) => {
         return response.choices[0].message.content;
     } catch (error) {
         console.error("Groq error:", error.message);
+
         throw new Error(
             "Could not analyze the image. Check your Groq API key and try again."
         );
