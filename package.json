@@ -1,0 +1,22 @@
+{
+  "name": "image-recognition-chatbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^44.9.1"
+  },
+  "dependencies": {
+    "@google/genai": "^2.30.0",
+    "dotenv": "^18.0.8",
+    "groq-sdk": "^1.6.0"
+  }
+}
