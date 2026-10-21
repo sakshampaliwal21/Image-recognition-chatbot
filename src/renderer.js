@@ -1,14 +1,24 @@
+
 const imageInput = document.getElementById("image-input");
 const imagePreview = document.getElementById("image-preview");
+const messageInput = document.getElementById("message-input");
+const sendButton = document.getElementById("send-button");
+const chatBox = document.getElementById("chat-box");
+
+let selectedImage = "";
+let conversationHistory = [];
 
 imageInput.addEventListener("change", function () {
     const file = imageInput.files[0];
 
     if (!file) {
+        selectedImage = "";
+        imagePreview.innerHTML = "";
         return;
     }
 
     const imageUrl = URL.createObjectURL(file);
+    const reader = new FileReader();
 
     imagePreview.innerHTML = "";
 
@@ -17,24 +27,6 @@ imageInput.addEventListener("change", function () {
     image.alt = "Selected image";
 
     imagePreview.appendChild(image);
-});
-
-const messageInput = document.getElementById("message-input");
-const sendButton = document.getElementById("send-button");
-const chatBox = document.getElementById("chat-box");
-
-let selectedImage = "";
-let conversationHistory = [];
-
-
-imageInput.addEventListener("change", function () {
-    const file = imageInput.files[0];
-
-    if (!file) {
-        return;
-    }
-
-    const reader = new FileReader();
 
     reader.onload = function () {
         selectedImage = reader.result;
@@ -43,7 +35,7 @@ imageInput.addEventListener("change", function () {
     reader.readAsDataURL(file);
 });
 
-sendButton.addEventListener("click", async function () {
+async function sendMessage() {
     const question = messageInput.value.trim();
 
     if (!selectedImage) {
@@ -53,6 +45,10 @@ sendButton.addEventListener("click", async function () {
 
     if (question === "") {
         alert("Please enter a question.");
+        return;
+    }
+
+    if (sendButton.disabled) {
         return;
     }
 
@@ -67,30 +63,40 @@ sendButton.addEventListener("click", async function () {
     loadingMessage.textContent = "AI is thinking...";
     chatBox.appendChild(loadingMessage);
 
-    
-try {
-    const answer = await window.imageAI.ask({
-        image: selectedImage,
-        question: question,
-        history: conversationHistory
-    });
+    try {
+        const answer = await window.imageAI.ask({
+            image: selectedImage,
+            question: question,
+            history: conversationHistory
+        });
 
-    conversationHistory.push({
-        role: "user",
-        content: question
-    });
+        conversationHistory.push({
+            role: "user",
+            content: question
+        });
 
-    conversationHistory.push({
-        role: "assistant",
-        content: answer
-    });
+        conversationHistory.push({
+            role: "assistant",
+            content: answer
+        });
 
-    loadingMessage.textContent = "AI: " + answer;
-} catch (error) {
-    loadingMessage.textContent =
-        "Sorry, I couldn't analyze the image. Please try again.";
+        loadingMessage.textContent = "AI: " + answer;
+    } catch (error) {
+        console.error("Image analysis failed:", error);
+
+        loadingMessage.textContent =
+            "AI: Sorry, something went wrong. Please check your internet connection or API setup and try again.";
+    } finally {
+        sendButton.disabled = false;
+        messageInput.focus();
+    }
 }
 
+sendButton.addEventListener("click", sendMessage);
 
-    sendButton.disabled = false;
+messageInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
 });
