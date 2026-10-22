@@ -17,6 +17,10 @@ imageInput.addEventListener("change", function () {
         return;
     }
 
+    selectedImage = "";
+    conversationHistory = [];
+    chatBox.innerHTML = "";
+
     const imageUrl = URL.createObjectURL(file);
     const reader = new FileReader();
 
