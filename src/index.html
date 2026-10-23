@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Recognition Chatbot</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,45 +12,26 @@
         <aside class="sidebar">
             <h2>Vision Chat</h2>
             <button id="new-chat">+ New Chat</button>
-            <h3>Chat History</h3>
-            <p class="history">Your chats</p>
         </aside>
-
         <main class="chat-area">
             <header>
                 <h2>Image Recognition Chatbot</h2>
                 <p>Upload an image and ask questions about it.</p>
             </header>
-
             <section id="chat-box">
                 <div class="welcome">
                     <h2>What would you like to explore?</h2>
                     <p>Upload an image to get started.</p>
                 </div>
             </section>
-
             <div id="image-preview"></div>
-
             <div class="input-area">
                 <input type="file" id="image-input" accept="image/*">
-                <input
-                    type="text"
-                    id="message-input"
-                    placeholder="Ask something about your image...">
+                <input type="text" id="message-input" placeholder="Ask something about your image...">
                 <button id="send-button">Send</button>
             </div>
         </main>
     </div>
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Image Recognition Chatbot</title>
-</head>
-<body>
-    <h1>Image Recognition Chatbot</h1>
-    <p>Welcome! Your desktop application is running.</p>
     <script src="renderer.js"></script>
 </body>
 </html>

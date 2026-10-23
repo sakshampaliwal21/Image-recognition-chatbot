@@ -4,9 +4,21 @@ const imagePreview = document.getElementById("image-preview");
 const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send-button");
 const chatBox = document.getElementById("chat-box");
+const newChatButton = document.getElementById("new-chat");
 
 let selectedImage = "";
 let conversationHistory = [];
+
+newChatButton.addEventListener("click", function () {
+    conversationHistory = [];
+    selectedImage = "";
+    chatBox.innerHTML = "";
+    imagePreview.innerHTML = "";
+    imageInput.value = "";
+    messageInput.value = "";
+    sendButton.disabled = false;
+    messageInput.focus();
+});
 
 imageInput.addEventListener("change", function () {
     const file = imageInput.files[0];
@@ -23,13 +35,11 @@ imageInput.addEventListener("change", function () {
     const reader = new FileReader();
 
     imagePreview.innerHTML = "";
-
     const image = document.createElement("img");
     image.src = imageUrl;
     image.alt = "Selected image";
 
     imagePreview.appendChild(image);
-
     reader.onload = function () {
         selectedImage = reader.result;};
 
@@ -71,9 +81,20 @@ async function sendMessage() {
         conversationHistory.push({role: "assistant",content: answer});
 
         loadingMessage.textContent = "AI: " + answer;
+        const copyButton = document.createElement("button");
+        copyButton.textContent = "Copy";
+        copyButton.style.marginLeft = "10px";
+
+        copyButton.addEventListener("click", async function () {
+            try {await navigator.clipboard.writeText(answer);
+                copyButton.textContent = "Copied!";
+            } catch (error) {
+                alert("Unable to copy response."); }
+        });
+
+loadingMessage.appendChild(copyButton);
     } catch (error) {
         console.error("Image analysis failed:", error);
-
         loadingMessage.textContent =
             "AI: Sorry, something went wrong. Please check your internet connection or API setup and try again.";
     } finally {
