@@ -10,12 +10,10 @@ let conversationHistory = [];
 
 imageInput.addEventListener("change", function () {
     const file = imageInput.files[0];
-
     if (!file) {
         selectedImage = "";
         imagePreview.innerHTML = "";
-        return;
-    }
+        return; }
 
     selectedImage = "";
     conversationHistory = [];
@@ -33,28 +31,23 @@ imageInput.addEventListener("change", function () {
     imagePreview.appendChild(image);
 
     reader.onload = function () {
-        selectedImage = reader.result;
-    };
+        selectedImage = reader.result;};
 
-    reader.readAsDataURL(file);
-});
+    reader.readAsDataURL(file);});
 
 async function sendMessage() {
     const question = messageInput.value.trim();
 
     if (!selectedImage) {
         alert("Please select an image first.");
-        return;
-    }
+        return;}
 
     if (question === "") {
         alert("Please enter a question.");
-        return;
-    }
+        return; }
 
     if (sendButton.disabled) {
-        return;
-    }
+        return;}
 
     const userMessage = document.createElement("p");
     userMessage.textContent = "You: " + question;
@@ -69,20 +62,13 @@ async function sendMessage() {
 
     try {
         const answer = await window.imageAI.ask({
-            image: selectedImage,
-            question: question,
-            history: conversationHistory
+            image: selectedImage, question: question,history: conversationHistory
         });
 
-        conversationHistory.push({
-            role: "user",
-            content: question
-        });
+        conversationHistory.push({role: "user",
+            content: question});
 
-        conversationHistory.push({
-            role: "assistant",
-            content: answer
-        });
+        conversationHistory.push({role: "assistant",content: answer});
 
         loadingMessage.textContent = "AI: " + answer;
     } catch (error) {
@@ -91,13 +77,9 @@ async function sendMessage() {
         loadingMessage.textContent =
             "AI: Sorry, something went wrong. Please check your internet connection or API setup and try again.";
     } finally {
-        sendButton.disabled = false;
-        messageInput.focus();
-    }
-}
+        sendButton.disabled = false; messageInput.focus();}}
 
 sendButton.addEventListener("click", sendMessage);
-
 messageInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();

@@ -1,6 +1,4 @@
-
 require("dotenv").config();
-
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const Groq = require("groq-sdk");
@@ -16,19 +14,18 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,
-            nodeIntegration: false
-        }
+            nodeIntegration: false}
     });
 
     win.loadFile("src/index.html");
 }
+
 
 ipcMain.handle("ask-image", async (event, data) => {
     try {
         if (!data || !data.question || !data.image) {
             throw new Error("Image and question are required.");
         }
-
         const historyMessages = Array.isArray(data.history)
             ? data.history
                 .filter(message =>
@@ -41,37 +38,22 @@ ipcMain.handle("ask-image", async (event, data) => {
                     content: message.content
                 }))
             : [];
-
         const response = await groq.chat.completions.create({
             model: "qwen/qwen3.8-27b",
-            messages: [
-                ...historyMessages,
+            messages: [...historyMessages,
                 {
                     role: "user",
                     content: [
-                        {
-                            type: "text",
+                        {type: "text",
                             text: data.question
-                        },
-                        {
-                            type: "image_url",
+                        },{type: "image_url",
                             image_url: {
-                                url: data.image
-                            }
-                        }
-                    ]
-                }
-            ]
-        });
-
+                                url: data.image} }]
+                }]});
         return response.choices[0].message.content;
     } catch (error) {
         console.error("Groq error:", error.message);
-
-        throw new Error(
-            "Could not analyze the image. Check your Groq API key and try again."
-        );
+        throw new Error( "Could not analyze the image. Check your Groq API key and try again.");
     }
 });
-
 app.whenReady().then(createWindow);
