@@ -41,9 +41,20 @@ imageInput.addEventListener("change", function () {
 
     imagePreview.appendChild(image);
     reader.onload = function () {
-        selectedImage = reader.result;};
+    const img = new Image();
 
-    reader.readAsDataURL(file);});
+    img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        selectedImage = canvas.toDataURL("image/jpeg", 0.85);
+    };
+
+    img.src = reader.result;
+};
+
+reader.readAsDataURL(file);});
 
 async function sendMessage() {
     const question = messageInput.value.trim();

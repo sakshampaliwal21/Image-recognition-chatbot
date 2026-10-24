@@ -12,7 +12,8 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "electron": "^44.9.1"
+    "electron": "^44.9.1",
+    "electron-builder": "^26.15.3"
   },
   "dependencies": {
     "@google/genai": "^2.30.0",

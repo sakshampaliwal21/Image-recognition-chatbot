@@ -38,8 +38,10 @@ ipcMain.handle("ask-image", async (event, data) => {
                     content: message.content
                 }))
             : [];
+            console.log("Image data format:", data.image.substring(0, 50));
         const response = await groq.chat.completions.create({
             model: "qwen/qwen3.8-27b",
+            max_tokens: 800,
             messages: [...historyMessages,
                 {
                     role: "user",
