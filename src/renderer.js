@@ -1,4 +1,3 @@
-
 const imageInput = document.getElementById("image-input");
 const imagePreview = document.getElementById("image-preview");
 const messageInput = document.getElementById("message-input");
@@ -88,10 +87,9 @@ async function sendMessage() {
 
         conversationHistory.push({role: "user",
             content: question});
-
         conversationHistory.push({role: "assistant",content: answer});
 
-        loadingMessage.textContent = "AI: " + answer;
+        loadingMessage.innerHTML = "AI: " + DOMPurify.sanitize(marked.parse(answer));
         const copyButton = document.createElement("button");
         copyButton.textContent = "Copy";
         copyButton.style.marginLeft = "10px";
@@ -105,10 +103,9 @@ async function sendMessage() {
 
 loadingMessage.appendChild(copyButton);
     } catch (error) {
-        console.error("Image analysis failed:", error);
-        loadingMessage.textContent =
-            "AI: Sorry, something went wrong. Please check your internet connection or API setup and try again.";
-    } finally {
+    console.error("Image analysis failed:", error);
+    loadingMessage.textContent = "AI Error: " + error.message;
+    }finally {
         sendButton.disabled = false; messageInput.focus();}}
 
 sendButton.addEventListener("click", sendMessage);
