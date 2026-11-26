@@ -11,7 +11,7 @@ const themeToggle = document.getElementById("theme-toggle");
 let selectedImage = "";
 let conversationHistory = [];
 
-/* Image preview modal */
+
 
 function openImagePreview(src) {
     const overlay = document.createElement("div");
@@ -52,7 +52,8 @@ function openImagePreview(src) {
     document.addEventListener("keydown", escapeHandler);
 }
 
-/* Make images clickable */
+
+
 
 function makeImageClickable(image) {
     image.style.cursor = "zoom-in";
@@ -62,7 +63,7 @@ function makeImageClickable(image) {
     });
 }
 
-/* Theme switching */
+
 
 themeToggle.addEventListener("click", function () {
     document.body.classList.toggle("dark-theme");
@@ -74,7 +75,8 @@ themeToggle.addEventListener("click", function () {
     }
 });
 
-/* Suggested prompts */
+
+
 
 function hideSuggestedPrompts() {
     suggestedPrompts.hidden = true;
@@ -91,7 +93,7 @@ document.querySelectorAll(".prompt-chip").forEach(function (button) {
     });
 });
 
-/* New chat */
+
 
 newChatButton.addEventListener("click", function () {
     conversationHistory = [];
@@ -114,7 +116,8 @@ newChatButton.addEventListener("click", function () {
     messageInput.focus();
 });
 
-/* Image upload */
+
+
 
 imageInput.addEventListener("change", function () {
     const file = imageInput.files[0];
@@ -149,9 +152,9 @@ imageInput.addEventListener("change", function () {
 
     imagePreview.appendChild(image);
 
-    // Click uploaded image to enlarge
-    makeImageClickable(image);
+    
 
+    makeImageClickable(image);
     const removeImageButton = document.createElement("button");
     removeImageButton.textContent = "✕ Remove Image";
     removeImageButton.className = "remove-image-button";
@@ -198,7 +201,8 @@ imageInput.addEventListener("change", function () {
     reader.readAsDataURL(file);
 });
 
-/* Send message to AI */
+
+
 
 async function sendMessage() {
     const question = messageInput.value.trim();
@@ -250,7 +254,9 @@ async function sendMessage() {
         loadingMessage.innerHTML =
             "AI: " + DOMPurify.sanitize(marked.parse(answer));
 
-        // Make all images in AI responses clickable
+        
+
+
         loadingMessage.querySelectorAll("img").forEach(function (image) {
             makeImageClickable(image);
         });
@@ -289,11 +295,11 @@ async function sendMessage() {
     }
 }
 
-/* Send button */
+
 
 sendButton.addEventListener("click", sendMessage);
 
-/* Enter key */
+
 
 messageInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter" && !event.shiftKey) {

@@ -41,7 +41,6 @@ body {
     overflow: hidden;
 }
 
-/* Sidebar */
 
 .sidebar {
     width: 245px;
@@ -73,7 +72,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* Dark mode button */
 
 #theme-toggle {
     width: 100%;
@@ -92,7 +90,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* Main chat area */
+
 
 .chat-area {
     flex: 1;
@@ -104,7 +102,7 @@ body {
     transition: background 0.25s;
 }
 
-/* Center heading */
+
 
 header {
     text-align: center;
@@ -133,7 +131,7 @@ header p {
     letter-spacing: 0.3px;
 }
 
-/* Chat messages */
+
 
 #chat-box {
     flex: 1;
@@ -166,7 +164,7 @@ header p {
     color: var(--text);
 }
 
-/* Image preview */
+
 
 #image-preview {
     padding: 5px 10px;
@@ -182,7 +180,7 @@ header p {
     box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
 }
 
-/* Remove image button */
+
 
 .remove-image-button {
     display: inline-block;
@@ -210,7 +208,6 @@ body.dark-theme .remove-image-button {
     border-color: #7f2939;
 }
 
-/* Suggested prompts */
 
 .suggested-prompts {
     margin: 10px 0 15px;
@@ -250,7 +247,7 @@ body.dark-theme .remove-image-button {
     transform: translateY(-2px);
 }
 
-/* Input section */
+
 
 .input-area {
     display: flex;
@@ -291,7 +288,7 @@ body.dark-theme .remove-image-button {
     box-shadow: 0 0 0 3px rgba(99, 91, 219, 0.12);
 }
 
-/* Buttons */
+
 
 button {
     border: none;
@@ -319,7 +316,7 @@ button {
     transform: none;
 }
 
-/* Clear input button */
+
 
 #clear-input {
     background: var(--bg);
@@ -337,7 +334,7 @@ button {
     border-color: #fecaca;
 }
 
-/* Copy response button */
+
 
 .copy-button {
     display: block;
@@ -355,7 +352,7 @@ button {
 }
 
 
-/* Scrollbar */
+
 
 #chat-box::-webkit-scrollbar {
     width: 7px;
@@ -366,7 +363,7 @@ button {
     border-radius: 10px;
 }
 
-/* Responsive design */
+
 
 @media (max-width: 700px) {
     .sidebar {
@@ -418,7 +415,7 @@ button {
     cursor: default;
 }
 
-/* Full-size image preview */
+
 
 .image-modal {
     position: fixed;
