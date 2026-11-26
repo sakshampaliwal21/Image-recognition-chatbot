@@ -1,73 +1,221 @@
+
 const imageInput = document.getElementById("image-input");
 const imagePreview = document.getElementById("image-preview");
 const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send-button");
 const chatBox = document.getElementById("chat-box");
 const newChatButton = document.getElementById("new-chat");
+const suggestedPrompts = document.getElementById("suggested-prompts");
+const themeToggle = document.getElementById("theme-toggle");
 
 let selectedImage = "";
 let conversationHistory = [];
 
+/* Image preview modal */
+
+function openImagePreview(src) {
+    const overlay = document.createElement("div");
+    overlay.className = "image-modal";
+
+    const preview = document.createElement("img");
+    preview.src = src;
+    preview.alt = "Full image preview";
+
+    const closeButton = document.createElement("button");
+    closeButton.className = "image-modal-close";
+    closeButton.textContent = "✕";
+    closeButton.setAttribute("aria-label", "Close preview");
+
+    overlay.appendChild(preview);
+    overlay.appendChild(closeButton);
+    document.body.appendChild(overlay);
+
+    function closePreview() {
+        overlay.remove();
+        document.removeEventListener("keydown", escapeHandler);
+    }
+
+    function escapeHandler(event) {
+        if (event.key === "Escape") {
+            closePreview();
+        }
+    }
+
+    overlay.addEventListener("click", closePreview);
+
+    preview.addEventListener("click", function (event) {
+        event.stopPropagation();
+    });
+
+    closeButton.addEventListener("click", closePreview);
+
+    document.addEventListener("keydown", escapeHandler);
+}
+
+/* Make images clickable */
+
+function makeImageClickable(image) {
+    image.style.cursor = "zoom-in";
+
+    image.addEventListener("click", function () {
+        openImagePreview(image.src);
+    });
+}
+
+/* Theme switching */
+
+themeToggle.addEventListener("click", function () {
+    document.body.classList.toggle("dark-theme");
+
+    if (document.body.classList.contains("dark-theme")) {
+        themeToggle.textContent = "☀️ Light Mode";
+    } else {
+        themeToggle.textContent = "🌙 Dark Mode";
+    }
+});
+
+/* Suggested prompts */
+
+function hideSuggestedPrompts() {
+    suggestedPrompts.hidden = true;
+}
+
+function showSuggestedPrompts() {
+    suggestedPrompts.hidden = false;
+}
+
+document.querySelectorAll(".prompt-chip").forEach(function (button) {
+    button.addEventListener("click", function () {
+        messageInput.value = button.dataset.prompt;
+        messageInput.focus();
+    });
+});
+
+/* New chat */
+
 newChatButton.addEventListener("click", function () {
     conversationHistory = [];
     selectedImage = "";
-    chatBox.innerHTML = "";
+
+    chatBox.innerHTML = `
+        <div class="welcome">
+            <h2>What would you like to explore?</h2>
+            <p>Upload an image to get started.</p>
+        </div>
+    `;
+
     imagePreview.innerHTML = "";
     imageInput.value = "";
     messageInput.value = "";
+
+    hideSuggestedPrompts();
+
     sendButton.disabled = false;
     messageInput.focus();
 });
 
+/* Image upload */
+
 imageInput.addEventListener("change", function () {
     const file = imageInput.files[0];
+
     if (!file) {
         selectedImage = "";
         imagePreview.innerHTML = "";
-        return; }
+        hideSuggestedPrompts();
+        return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please select a valid image.");
+        imageInput.value = "";
+        return;
+    }
 
     selectedImage = "";
     conversationHistory = [];
     chatBox.innerHTML = "";
+
+    hideSuggestedPrompts();
 
     const imageUrl = URL.createObjectURL(file);
     const reader = new FileReader();
 
     imagePreview.innerHTML = "";
+
     const image = document.createElement("img");
     image.src = imageUrl;
     image.alt = "Selected image";
 
     imagePreview.appendChild(image);
-    reader.onload = function () {
-    const img = new Image();
 
-    img.onload = function () {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        canvas.getContext("2d").drawImage(img, 0, 0);
-        selectedImage = canvas.toDataURL("image/jpeg", 0.85);
+    // Click uploaded image to enlarge
+    makeImageClickable(image);
+
+    const removeImageButton = document.createElement("button");
+    removeImageButton.textContent = "✕ Remove Image";
+    removeImageButton.className = "remove-image-button";
+
+    removeImageButton.addEventListener("click", function () {
+        selectedImage = "";
+        imagePreview.innerHTML = "";
+        imageInput.value = "";
+
+        hideSuggestedPrompts();
+    });
+
+    imagePreview.appendChild(removeImageButton);
+
+    reader.onload = function () {
+        const img = new Image();
+
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            canvas.getContext("2d").drawImage(img, 0, 0);
+
+            selectedImage = canvas.toDataURL("image/jpeg", 0.85);
+
+            showSuggestedPrompts();
+        };
+
+        img.onerror = function () {
+            alert("Unable to process this image.");
+            selectedImage = "";
+        };
+
+        img.src = reader.result;
     };
 
-    img.src = reader.result;
-};
+    reader.onerror = function () {
+        alert("Unable to read the selected image.");
+        selectedImage = "";
+    };
 
-reader.readAsDataURL(file);});
+    reader.readAsDataURL(file);
+});
+
+/* Send message to AI */
 
 async function sendMessage() {
     const question = messageInput.value.trim();
 
     if (!selectedImage) {
         alert("Please select an image first.");
-        return;}
+        return;
+    }
 
     if (question === "") {
         alert("Please enter a question.");
-        return; }
+        return;
+    }
 
     if (sendButton.disabled) {
-        return;}
+        return;
+    }
 
     const userMessage = document.createElement("p");
     userMessage.textContent = "You: " + question;
@@ -80,35 +228,73 @@ async function sendMessage() {
     loadingMessage.textContent = "AI is thinking...";
     chatBox.appendChild(loadingMessage);
 
+    chatBox.scrollTop = chatBox.scrollHeight;
+
     try {
         const answer = await window.imageAI.ask({
-            image: selectedImage, question: question,history: conversationHistory
+            image: selectedImage,
+            question: question,
+            history: conversationHistory
         });
 
-        conversationHistory.push({role: "user",
-            content: question});
-        conversationHistory.push({role: "assistant",content: answer});
+        conversationHistory.push({
+            role: "user",
+            content: question
+        });
 
-        loadingMessage.innerHTML = "AI: " + DOMPurify.sanitize(marked.parse(answer));
+        conversationHistory.push({
+            role: "assistant",
+            content: answer
+        });
+
+        loadingMessage.innerHTML =
+            "AI: " + DOMPurify.sanitize(marked.parse(answer));
+
+        // Make all images in AI responses clickable
+        loadingMessage.querySelectorAll("img").forEach(function (image) {
+            makeImageClickable(image);
+        });
+
         const copyButton = document.createElement("button");
-        copyButton.textContent = "Copy";
-        copyButton.style.marginLeft = "10px";
+
+        copyButton.textContent = "📋 Copy Response";
+        copyButton.className = "copy-button";
 
         copyButton.addEventListener("click", async function () {
-            try {await navigator.clipboard.writeText(answer);
-                copyButton.textContent = "Copied!";
+            try {
+                await navigator.clipboard.writeText(answer);
+
+                copyButton.textContent = "✓ Copied!";
+
+                setTimeout(function () {
+                    copyButton.textContent = "📋 Copy Response";
+                }, 2000);
+
             } catch (error) {
-                alert("Unable to copy response."); }
+                alert("Unable to copy response.");
+            }
         });
 
-loadingMessage.appendChild(copyButton);
+        loadingMessage.appendChild(copyButton);
+
     } catch (error) {
-    console.error("Image analysis failed:", error);
-    loadingMessage.textContent = "AI Error: " + error.message;
-    }finally {
-        sendButton.disabled = false; messageInput.focus();}}
+        console.error("Image analysis failed:", error);
+
+        loadingMessage.textContent = "AI Error: " + error.message;
+
+    } finally {
+        sendButton.disabled = false;
+        messageInput.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+}
+
+/* Send button */
 
 sendButton.addEventListener("click", sendMessage);
+
+/* Enter key */
+
 messageInput.addEventListener("keydown", function (event) {
     if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
